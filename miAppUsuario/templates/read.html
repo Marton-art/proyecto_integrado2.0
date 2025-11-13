@@ -1,0 +1,190 @@
+{% extends 'home.html'%}
+
+{% block content %}
+<style>
+    /* --- COPIA TODO EL BLOQUE DE ESTILOS CSS QUE ENVIASTE AQUÍ --- 
+       (Para simplificar la respuesta, no lo copio, pero debe estar aquí)
+    */
+    /* Estilos Adicionales para la Tabla */
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .user-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 10px; /* Espacio entre filas */
+        min-width: 800px; /* Asegura que la tabla no se colapse */
+    }
+
+    .user-table th {
+        background: #f8f9fa;
+        color: #667eea;
+        font-weight: 700;
+        padding: 15px 20px;
+        text-align: left;
+        border-bottom: 2px solid #e0e0e0;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+    }
+
+    .user-table td {
+        background: #ffffff;
+        padding: 15px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        color: #333;
+        font-size: 0.95rem;
+        transition: background 0.2s ease;
+    }
+
+    .user-table tr:hover td {
+        background: #fafbff;
+    }
+
+    .user-table tr:first-child th:first-child {
+        border-top-left-radius: 10px;
+    }
+    .user-table tr:first-child th:last-child {
+        border-top-right-radius: 10px;
+    }
+    
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .status-active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-inactive {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .action-btn {
+        color: #667eea;
+        text-decoration: none;
+        margin-right: 15px;
+        transition: color 0.2s ease;
+    }
+
+    .action-btn:hover {
+        color: #764ba2;
+    }
+        /* Estilos necesarios para el botón de "Volver" */
+    .back-btn {
+        /* 1. Usar Flexbox para alinear el ícono y el texto */
+        display: flex;
+        align-items: center; /* Alinea verticalmente el ícono y el texto */
+        
+        /* 2. Estilos para el contenedor del botón */
+        color: #667eea; /* Color del texto y del stroke del SVG */
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s ease;
+    }
+
+    .back-btn:hover {
+        color: #764ba2;
+    }
+
+    /* 3. Definir el tamaño y margen del SVG */
+    .back-btn svg {
+        width: 20px; /* Tamaño horizontal del ícono */
+        height: 20px; /* Tamaño vertical del ícono */
+        margin-right: 8px; /* Espacio entre el ícono y el texto "Volver al Home" */
+        min-width: 20px; /* Asegura que no se achique en pantallas pequeñas */
+    }
+
+    /* 4. Estilos para el header que contiene el botón */
+    .header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; /* Asegura que todo el contenido del header empiece a la izquierda */
+        gap: 10px; /* Espacio entre el botón y el título H1 */
+        margin-bottom: 20px;
+    }
+</style>
+<div>
+    <div class="container">
+        <header class="header">
+            <a href="{% url 'home' %}" class="back-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Volver al Home
+            </a>
+            <h1>Listado de Usuarios Registrados</h1>
+            <p class="subtitle">Visualiza, edita y gestiona todos los registros de usuarios.</p>
+        </header>
+
+        <main class="main-content">
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="table-container">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre Completo</th>
+                            <th>Email</th>
+                            <th>País</th>
+                            <th>Rol</th>
+                            <th>Activo</th>
+                            <th>Fecha Creación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for usuario in usuarios %}
+                        <tr>
+                            <td>{{ usuario.id }}</td>
+                            <td>{{ usuario.nombre }} {{ usuario.apellido }}</td>
+                            <td>{{ usuario.email }}</td>
+                            <td>{{ usuario.pais_usuario.nombre|default:"N/A" }}</td>
+                            <td>{{ usuario.rol_usuario.nombre }}</td>
+                            <td>
+                                {% if usuario.is_active %}
+                                    <span class="status-badge status-active">Activo</span>
+                                {% else %}
+                                    <span class="status-badge status-inactive">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ usuario.fecha_creacion|date:"Y-m-d H:i" }}</td>
+                            <td>
+                                <a href="{% url 'edit' usuario.id %}" class="action-btn" title="Editar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                                </a>
+                                <a href="{% url 'delete' usuario.id %}" class="action-btn" title="Eliminar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 30px;">
+                                No se encontraron usuarios registrados.
+                                <a href="{% url 'create' %}" style="color: #667eea; font-weight: 600;">¡Crea el primero aquí!</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+        </main>
+    </div>
+</div>
+{% endblock %}
