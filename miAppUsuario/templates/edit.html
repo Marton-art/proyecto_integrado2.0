@@ -1,0 +1,327 @@
+{% extends 'home.html'%}
+
+{% block content %}
+<style>
+    /* ======================================
+    Estilos Específicos para Formularios 
+    (Basados en create.html, sin Tabs ni Bulk Upload)
+    ======================================
+    */
+
+    /* Ajuste del ancho del contenedor para el formulario */
+    .container {
+        max-width: 1000px;
+    }
+
+    /* Estilos del Header y Botón de Volver */
+    .header {
+        color: white;
+        margin-bottom: 30px;
+        padding: 20px 0;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
+        text-decoration: none;
+        padding: 10px 20px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 25px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .back-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateX(-5px);
+    }
+
+    .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    .main-content {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    /* Mensajes */
+    .messages {
+        margin-bottom: 20px;
+    }
+
+    .alert {
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border-left: 4px solid #28a745;
+    }
+
+    .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+        border-left: 4px solid #dc3545;
+    }
+
+    /* Formulario */
+    .user-form {
+        animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .form-group label svg {
+        width: 18px;
+        height: 18px;
+        color: #667eea;
+    }
+
+    /* Estilo para inputs y selects */
+    .form-group input, .form-group select {
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+    }
+
+    /* Botones */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 30px;
+        border-radius: 10px;
+        border: none;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Color principal para el botón de Actualizar (Update: celeste/azul claro) */
+    .btn-primary {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); 
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4); 
+    }
+
+    .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .btn-secondary {
+        background: #f0f0f0;
+        color: #666;
+    }
+
+    .btn-secondary:hover {
+        background: #e0e0e0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        .main-content {
+            padding: 20px;
+        }
+    }
+</style>
+<div>
+    <div class="container">
+        <header class="header">
+            <a href="{% url 'usuarios:read' %}" class="back-btn"> 
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Volver al Listado
+            </a>
+            <h1>Actualizar Usuario: {{ usuario.first_name }} {{ usuario.last_name }}</h1>
+            <p class="subtitle">Modifica los datos del usuario seleccionado. Deja los campos de contraseña vacíos si no deseas cambiarlos.</p>
+        </header>
+
+        <main class="main-content">
+            <form method="POST" class="user-form" action="{% url 'usuarios:edit' usuario.id %}">
+                {% csrf_token %}
+                
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        {{ form.first_name }}
+                        {% if form.nombre.errors %}<small class="text-danger">{{ form.nombre.errors }}</small>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>Apellido</label>
+                        {{ form.last_name }}
+                        {% if form.apellido.errors %}<small class="text-danger">{{ form.apellido.errors }}</small>{% endif %}
+                    </div>
+                
+                    <div class="form-group">
+                        <label>Email</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}<small class="text-danger">{{ form.email.errors }}</small>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        {{ form.telefono }}
+                        {% if form.telefono.errors %}<small class="text-danger">{{ form.telefono.errors }}</small>{% endif %}
+                    </div>
+                
+                    <div class="form-group">
+                        <label>Edad</label>
+                        {{ form.edad }}
+                        {% if form.edad.errors %}<small class="text-danger">{{ form.edad.errors }}</small>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>Rol de Usuario</label>
+                        {{ form.rol_usuario }}
+                        {% if form.rol_usuario.errors %}<small class="text-danger">{{ form.rol_usuario.errors }}</small>{% endif %}
+                    </div>
+                
+                    <div class="form-group">
+                        <label>País de Usuario</label>
+                        {{ form.pais_usuario }}
+                        {% if form.pais_usuario.errors %}<small class="text-danger">{{ form.pais_usuario.errors }}</small>{% endif %}
+                    </div>
+
+                    <div class="form-group" style="justify-content: center;">
+                        <label>Estado Activo:</label>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                            {{ form.is_active }} 
+                            <span style="font-weight: 400;">(Marcar/Desmarcar para activar o desactivar)</span>
+                            {% if form.is_active.errors %}<small class="text-danger">{{ form.is_active.errors }}</small>{% endif %}
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label>Contraseña (Nueva)</label>
+                        {{ form.contraseña }}
+                        {% if form.contraseña.errors %}<small class="text-danger">{{ form.contraseña.errors }}</small>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmar Contraseña (Nueva)</label>
+                        {{ form.contraseña2 }}
+                        {% if form.contraseña2.errors %}<small class="text-danger">{{ form.contraseña2.errors }}</small>{% endif %}
+                    </div>
+                
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-error">{{ form.non_field_errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <script>
+                    // Script para aplicar la clase 'form-control' a los elementos del formulario
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const form = document.querySelector('.user-form');
+                        if (form) {
+                            // Aplica la clase a inputs, selects, y textareas (si los hubiera)
+                            form.querySelectorAll('input:not([type="submit"]):not([type="reset"]):not([type="hidden"]):not([type="checkbox"]), select, textarea').forEach(element => {
+                                // Evita aplicar el estilo de borde al checkbox 'is_active' si existe
+                                if (element.id !== 'id_is_active') { 
+                                    element.classList.add('form-control');
+                                }
+                            });
+
+                            // Asegura que los selects también tomen el estilo
+                            form.querySelectorAll('select').forEach(element => {
+                                element.classList.add('form-control');
+                            });
+                        }
+                    });
+                </script>
+                
+                <div class="form-actions">
+                    <a href="{% url 'usuarios:read' %}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
+{% endblock %}

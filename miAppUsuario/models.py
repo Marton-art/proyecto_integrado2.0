@@ -2,16 +2,67 @@ from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
 from django.conf import settings
 from django.utils import timezone
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 # Create your models here.
-class Usuario(models.Model):
-    nombre = models.CharField(max_length=100)
-    apellido = models.CharField(max_length=100)
+# 🔑 1. DEFINIR EL CUSTOM MANAGER (SOLUCIÓN AL ERROR)
+class UsuarioManager(BaseUserManager):
+    # Método requerido para crear usuarios normales
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('El email debe ser establecido.')
+        
+        email = self.normalize_email(email)
+        
+        # ⚠️ Nota: AbstractBaseUser tiene un campo 'password' implícito, 
+        # así que creamos el objeto sin hashear y luego usamos set_password.
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    # Método requerido para crear superusuarios (administradores)
+    def create_superuser(self, email, password=None, **extra_fields):
+        # Asume que tu modelo tiene is_staff y is_superuser
+        extra_fields.setdefault('is_active', True)
+        # ⚠️ Es posible que necesites añadir is_staff y is_superuser a tu modelo 
+        # Usuario si quieres usar esta funcionalidad, o a los extra_fields.
+        
+        # Necesitas definir cómo se manejan los roles aquí si son requeridos
+        # (Si Rol y País son obligatorios, debes asegurarte de que se pasen aquí o tengan un valor por defecto para el superusuario)
+        
+        # Asignar valores obligatorios para el superusuario
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+        
+        return self.create_user(email, password, **extra_fields)
+
+class Usuario(AbstractUser):
+    username = None
     edad = models.PositiveBigIntegerField(null = True, blank = True)
     email = models.EmailField(max_length=254, unique = True)
-    contraseña_hash = models.CharField(max_length=255)
     telefono = models.CharField(max_length=30,blank=True, null=True , unique=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True, null=True)
-    is_active = models.BooleanField(default=False)
+
+    # 🔑 CRUCIAL: Define el campo que se usa para iniciar sesión
+    USERNAME_FIELD = 'email' 
+    def has_perm(self, perm, obj=None):
+        "Does the user have a specific permission?"
+        # Implementación simple: solo los superusuarios tienen todos los permisos
+        return self.is_superuser
+
+    def has_module_perms(self, app_label):
+        "Does the user have permissions to view the app 'app_label'?"
+        # Implementación simple: solo los superusuarios tienen acceso a módulos
+        return self.is_superuser
+    
+    objects = UsuarioManager()
+    # Debes incluir 'nombre' y 'apellido' si quieres que sean obligatorios al crear el superusuario.
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'rol_usuario_id', 'pais_usuario_id']
     rol_usuario = models.ForeignKey(
         'Rol',
         on_delete = models.CASCADE,
@@ -31,14 +82,14 @@ class Usuario(models.Model):
     
     def set_clave_secreta(self, clave_raw):
         # 🟢 CORRECCIÓN
-        self.contraseña_hash = make_password(clave_raw)
+        self.set_password(clave_raw)
         
     def check_clave_secreta(self, clave_raw):
         # 🟢 CORRECCIÓN
-        return check_password(clave_raw, self.contraseña_hash)
+        return self.check_password(clave_raw)	
 
     class Meta:
-        ordering = ['nombre'] 
+        ordering = ['first_name'] 
         # ordering hara que se ordene del nombre mas reciente al mas antiguo 
     def __str__(self):
         return f"{self.nombre} {self.apellido} <{self.email}>"

@@ -17,7 +17,7 @@ class UsuarioForm(forms.ModelForm):
     class Meta:
         model = Usuario
         # 🟢 AÑADIMOS los campos: 'telefono', 'edad', 'rol_usuario', 'pais_usuario'
-        fields = ['nombre', 'apellido', 'email', 'telefono', 'edad', 'rol_usuario', 'pais_usuario'] 
+        fields = ['first_name', 'last_name', 'email', 'telefono', 'edad', 'rol_usuario', 'pais_usuario', 'is_active'] 
         
         # Opcional: Mejora la experiencia de usuario con placeholders
         widgets = {
@@ -41,3 +41,21 @@ class UsuarioForm(forms.ModelForm):
             )
         
         return cleaned_data
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # 🔑 Lógica CRUCIAL para la edición
+        # Si el formulario está ligado a una instancia existente (self.instance tiene un PK),
+        # significa que estamos EDITANDO. Hacemos la contraseña opcional.
+        if self.instance and self.instance.pk:
+            self.fields['contraseña'].required = False
+            self.fields['contraseña2'].required = False
+            
+        # Opcional: Para añadir el estilo 'form-control' a todos los campos
+        for field_name, field in self.fields.items():
+            if field_name not in ['is_active']:
+                # Aquí se ignoran los placeholders definidos en widgets si se ponen atributos fijos
+                # Si quieres que se mantengan los placeholders definidos en 'widgets', 
+                # puedes ser más selectivo aquí.
+                field.widget.attrs.update({'class': 'form-control'})

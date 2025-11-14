@@ -15,9 +15,12 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/admin-dashboard/'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+
+AUTH_USER_MODEL = 'miAppUsuario.Usuario'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-jtkvaliafy!hk%ofpe$6^9r1jy*0tzcfz%)808op2n0crvow_%'
@@ -84,11 +87,11 @@ WSGI_APPLICATION = 'miProyecto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'nuam_db',     # nombre de la BD
-        'USER': 'postgres',            # usuario de PostgreSQL
-        'PASSWORD': 'Colocolo30*',   # contraseña.
-        'HOST': 'localhost',   # lo dejare asi por ahora ya que es totalmente local fecha programada la migracion de datos de postgres 7/11/2025.
-        'PORT': '5432',   # puerto por defecto.
+        'NAME': 'nuam_db',    
+        'USER': 'postgres',          
+        'PASSWORD': 'Colocolo30*',   
+        'HOST': 'localhost', 
+        'PORT': '5432',   
     }
 }
 

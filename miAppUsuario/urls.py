@@ -1,5 +1,8 @@
 from miAppUsuario import views
 from django.urls import path
+
+app_name = 'usuarios'
+
 urlpatterns = [
     path('', views.home, name='home'),
     path('crear/', views.create, name='create'),

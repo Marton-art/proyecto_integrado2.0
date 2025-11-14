@@ -232,7 +232,7 @@ body {
                     </div>
                     <h2>Crear</h2>
                     <p>Agrega nuevos registros al sistema</p>
-                    <a href="{% url 'create'%}" class="btn btn-create">Nuevo Registro</a>
+                    <a href="{% url 'usuarios:create'%}" class="btn btn-create">Nuevo Registro</a>
                 </div>
 
                 <!-- Card: Leer/Ver -->
@@ -245,7 +245,7 @@ body {
                     </div>
                     <h2>Ver Registros</h2>
                     <p>Consulta todos los registros existentes</p>
-                    <a href="{% url 'read' %}" class="btn btn-read">Ver Todos</a>
+                    <a href="{% url 'usuarios:read' %}" class="btn btn-read">Ver Todos</a>
                 </div>
 
                 <!-- Card: Actualizar -->
@@ -258,7 +258,7 @@ body {
                     </div>
                     <h2>Actualizar</h2>
                     <p>Modifica registros existentes</p>
-                    <a href="#" class="btn btn-update">Editar Registros</a>
+                    <a href="{% url 'usuarios:read' %}" class="btn btn-update">Editar Registros</a>
                 </div>
 
                 <!-- Card: Eliminar -->
@@ -273,7 +273,7 @@ body {
                     </div>
                     <h2>Eliminar</h2>
                     <p>Elimina registros del sistema</p>
-                    <a href="#" class="btn btn-delete">Gestionar</a>
+                    <a href="{% url 'usuarios:read' %}" class="btn btn-delete">Gestionar</a>
                 </div>
             </div>
 

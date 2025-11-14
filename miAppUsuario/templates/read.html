@@ -2,9 +2,6 @@
 
 {% block content %}
 <style>
-    /* --- COPIA TODO EL BLOQUE DE ESTILOS CSS QUE ENVIASTE AQUÍ --- 
-       (Para simplificar la respuesta, no lo copio, pero debe estar aquí)
-    */
     /* Estilos Adicionales para la Tabla */
     .table-container {
         overflow-x: auto;
@@ -113,7 +110,7 @@
 <div>
     <div class="container">
         <header class="header">
-            <a href="{% url 'home' %}" class="back-btn">
+            <a href="{% url 'usuarios:home' %}" class="back-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="19" y1="12" x2="5" y2="12"></line>
                     <polyline points="12 19 5 12 12 5"></polyline>
@@ -151,7 +148,7 @@
                         {% for usuario in usuarios %}
                         <tr>
                             <td>{{ usuario.id }}</td>
-                            <td>{{ usuario.nombre }} {{ usuario.apellido }}</td>
+                            <td>{{ usuario.first_name }} {{ usuario.last_name }}</td>
                             <td>{{ usuario.email }}</td>
                             <td>{{ usuario.pais_usuario.nombre|default:"N/A" }}</td>
                             <td>{{ usuario.rol_usuario.nombre }}</td>
@@ -164,10 +161,10 @@
                             </td>
                             <td>{{ usuario.fecha_creacion|date:"Y-m-d H:i" }}</td>
                             <td>
-                                <a href="{% url 'edit' usuario.id %}" class="action-btn" title="Editar">
+                                <a href="{% url 'usuarios:edit' usuario.id %}" class="action-btn" title="Editar">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
                                 </a>
-                                <a href="{% url 'delete' usuario.id %}" class="action-btn" title="Eliminar">
+                                <a href="{% url 'usuarios:delete' usuario.id %}" class="action-btn" title="Eliminar">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                 </a>
                             </td>
@@ -176,7 +173,7 @@
                         <tr>
                             <td colspan="8" style="text-align: center; padding: 30px;">
                                 No se encontraron usuarios registrados.
-                                <a href="{% url 'create' %}" style="color: #667eea; font-weight: 600;">¡Crea el primero aquí!</a>
+                                <a href="{% url 'usuarios:create' %}" style="color: #667eea; font-weight: 600;">¡Crea el primero aquí!</a>
                             </td>
                         </tr>
                         {% endfor %}

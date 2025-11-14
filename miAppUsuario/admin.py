@@ -5,7 +5,7 @@ from miAppCalificacion.models import Pais, Moneda
 # Register your models here.
 @admin.register(Usuario)
 class UsuarioAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nombre', 'apellido')
+    list_display = ('id', 'first_name', 'last_name')
 
 @admin.register(Rol)
 class RolAdmin(admin.ModelAdmin):
